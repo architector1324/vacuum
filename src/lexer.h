@@ -1,5 +1,4 @@
 #ifndef LEXER_H
-
 #define LEXER_H
 
 #include <stdlib.h>
@@ -30,21 +29,23 @@ typedef enum{
     // MEMORY_SPEC
     REGISTERS_TEMPLATE, STACK_TEMPLATE, MEMORY_TEMPLATE, AUTO_TEMPLATE,
     // OPERATORS
-    SND, CALL, RET, ADD, MUL, DIV, OR, AND, XOR, NOT, PUSH, POP, INC, DEC,
+    SND, CALL, RET, ADD, MUL, DIV, OR, AND, XOR, NOT, PUSH, POP, INC, DEC, GO,
     // MODIFERS
     VACUUM, VAR8, VAR16, VAR32, VAR64, VAR128, PAC, PTR, FINAL, DGT,
     // OTHER
-    NAME, NUMBER, NEWLINE, END
+    NAME, NUMBER, NEWLINE, SPACE, TAB, END
 } Lexem;
-typedef enum{SPECIAL, REGISTER, OPERATOR, INSTRUCTION, MODIFER, MEM_TEMPLATE, OTHER} LexemType;
+typedef enum{SPECIAL, REGISTER, OPERATOR, MODIFER, MEM_TEMPLATE, OTHER} LexemType;
 
 typedef struct{
     const char* src;
     Lexem lexem;
 } LexemSrc;
 
-static LexemSrc special[] = {
+static LexemSrc specials[] = {
     {"\n", NEWLINE},
+    {" ", SPACE},
+    {"\t", TAB},
     {"++", DOUBLE_PLUS},
     {"--", DOUBLE_MINUS},
     {"+", PLUS},
@@ -218,7 +219,8 @@ static LexemSrc operators[] = {
     {"push", PUSH},
     {"pop", POP},
     {"inc", INC},
-    {"dec", DEC}
+    {"dec", DEC},
+    {"go", GO}
 };
 
 static LexemSrc modifers[] = {
@@ -241,10 +243,48 @@ static LexemSrc memory_templates[] = {
     {"a", AUTO_TEMPLATE}
 };
 
+static struct{
+    LexemType type;
+    const LexemSrc* src;
+    size_t count;
+} lexems[] = {
+    {SPECIAL, specials, 25},
+    {REGISTER, registers, 128},
+    {OPERATOR, operators, 15},
+    {MODIFER, modifers, 10},
+    {MEM_TEMPLATE, memory_templates, 4}
+};
+static size_t lexems_count = 5;
+
+typedef struct{
+    Lexem lex;
+    LexemType lex_type;
+
+    const char* word;
+    size_t word_len;
+
+    size_t num_val;
+} Token;
+
+typedef struct{
+    Token* list;
+    size_t count;
+} TokenList;
+
 // CONSTRUCTORS
+Token con_Token(Lexem lex, LexemType type, const char* word, size_t word_len, size_t num_val);
+TokenList con_TokenList();
 
 // DESTRUCTORS
+void del_TokenList(TokenList* list);
 
 // METHODS
+TokenList tokenize(const char* prog); // create a list of tokens from source code
+
+void getWord(const char** prog, TokenList* list);
+bool getLexem(const char* word, size_t len, TokenList* list);
+void getSpecial(const char** prog, bool ignore_spaces, TokenList* list);
+
+void addToken(Token token, TokenList* list);
 
 #endif // LEXER_H

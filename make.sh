@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc -g src/*.c -o bin/vacuum
+gcc -g -Wall src/*.c -o bin/vacuum
