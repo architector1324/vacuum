@@ -1,0 +1,46 @@
+General:
+
+UPPERCASE - terminals
+CamelCase - non-terminals
+
+Term -> TERMINALS | NonTerminals
+list<Term> -> Term list<Term> | epsilon
+SeparatedList<Term> -> Term COMMA SeparatedList<Term> | epsilon
+
+---------------------------------------------------------------------------------------------------------
+Vacuum Object-Oriented Part Grammar:
+
+not defined yet...
+
+---------------------------------------------------------------------------------------------------------
+Vacuum Functional Part Grammar:
+
+SimpleExpression -> EMPTY | REGISTER | NAME | NUMBER | BracedExpression
+BracedExpression -> (L_BRACE Expression R_BRACE) | (L_SQUARE_BRACE Expression R_SQUARE_BRACE)
+BinaryOperator -> Expression OPERATOR Expression
+CallExpression -> NAME BracedExpression
+Expression -> SimpleExpression | BinaryOperator | CallExpression | SeparatedList<Expression> 
+Instruction -> OPERATOR Expression
+
+Condition -> L_BRACE Expression (LESS | GREATER | EQUAL | LESS_EQUAL | GREATER_EQUAL) Expression R_BRACE
+ConditionalInstruction -> (Condition | epsilon) Instruction
+
+Declaration -> list<BracedExpression MODIFER BracedExpression> (NAME | epsilon)
+Variable -> Declaration BracedExpression
+
+DeclarationExpression -> L_BRACE SeparatedList<Declaration> R_BRACE
+MethodDeclaration -> Declaration DeclarationExpression 
+
+SingleInstructionMethod -> MethodDeclaration ConditionalInstruction
+Method -> MethodDeclaration L_FIGURE_BRACE list<Method | SingleInstructionMethod | ConditionalInstruction> R_FIGURE_BRACE
+
+---------------------------------------------------------------------------------------------------------
+Vacuum VM Assembly Part Grammar:
+
+SingleInstruction -> OPERATOR SimpleExpression COMMA SimpleExpression
+Instruction -> OPERATOR SimpleExpression COMMA SimpleExpression COMMA SimpleExpression
+NonOperandInstruction -> OPERATOR
+SpecialInstruction -> OPERATOR SimpleExpression
+
+Label -> Name COLON
+Data -> Label MODIFER SeparatedList<Number>

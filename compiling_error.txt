@@ -1,0 +1,6 @@
+/usr/bin/ld: /tmp/cc3QlgW5.o: in function `main':
+main.c:(.text+0x2a): undefined reference to `tokenize'
+/usr/bin/ld: main.c:(.text+0x3e): undefined reference to `parse'
+/usr/bin/ld: main.c:(.text+0x55): undefined reference to `delete_TokenList'
+/usr/bin/ld: main.c:(.text+0x61): undefined reference to `delete_Node'
+collect2: ошибка: выполнение ld завершилось с кодом возврата 1
