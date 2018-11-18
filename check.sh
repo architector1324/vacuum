@@ -1,3 +1,3 @@
 #!/bin/bash
 
-valgrind --leak-check=full bin/vacuum
+valgrind --leak-check=full --show-leak-kinds=all bin/vacuum

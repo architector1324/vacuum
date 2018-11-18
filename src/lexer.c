@@ -7,7 +7,7 @@ Token con_Token(Lexem lex, LexemType type, const char* word, size_t word_len, si
     return result;
 }
 TokenList con_TokenList(){
-    const Token* list = (const Token*)malloc(sizeof(Token));
+    Token* list = (Token*)malloc(sizeof(Token));
     TokenList result = {list, 0};
     return result;
 }
@@ -41,14 +41,16 @@ void getWord(const char** prog, TokenList* list){
 
     while(isalnum(**prog)){
         if(!isdigit(**prog)) is_num = false;
-        *prog += 1;
+        (*prog)++;
         len++;
     } 
     
     if(len > 0){
-        if(is_num)addToken(con_Token(NUMBER, OTHER, 0, 0, strtoul(word, NULL, 10)), list);
+        if(is_num) addToken(con_Token(NUMBER, OTHER, 0, 0, strtoul(word, NULL, 10)), list);
         else if(!getLexem(word, len, list))
             addToken(con_Token(NAME, OTHER, word, len, 0), list);
+
+        next(word);
     }
 }
 bool getLexem(const char* word, size_t len, TokenList* list){
@@ -83,11 +85,12 @@ void getSpecial(const char** prog, bool ignore_spaces, TokenList* list){
                 if(curr_lex.lexem != SPACE && curr_lex.lexem != TAB) addToken(t, list);
             } else addToken(t, list);
 
+            if(curr_lex.lexem == NEWLINE) next(curr_lex.src);
             *prog += curr_lex_len;
             return;
         }
     }
-    throwAndExit("unexpected symbol", "Lexer");
+    if(**prog) throwAndExit("unexpected symbol", "Lexer");
 }
 
 void addToken(Token token, TokenList* list){
