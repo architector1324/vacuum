@@ -7,7 +7,7 @@ struct Node;
 
 typedef struct{
     struct Node** list;
-    ssize_t count;
+    size_t count;
 } NodeList;
 
 typedef struct Node{
