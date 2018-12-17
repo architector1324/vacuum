@@ -15,7 +15,7 @@
 ## Compilation stages
 ![](docs/compilation_stages.jpg)
 
-This compiler based on the ![Exodus](https://github.com/architector1324/Exodus) UCS.
+This compiler based on the [Exodus UCS](https://github.com/architector1324/Exodus).
 
 ## Docs
 - [Wiki](https://github.com/architector1324/vacuum/wiki)
