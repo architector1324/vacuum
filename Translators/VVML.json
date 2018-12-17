@@ -1,0 +1,17 @@
+{
+    "translators":{
+        "x86_64_gas":{
+            "translations":{
+                "find_numeric":{
+                    "find":{
+                        "value":{
+                            "keyword": "^snd$"
+                        }
+                    }
+                }
+            },
+            "main_translation": "find_numeric"
+        }
+    },
+    "main_translator": "x86_64_gas"
+}

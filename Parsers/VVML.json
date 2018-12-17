@@ -1,0 +1,408 @@
+{
+    "lexer": [
+        {
+            "name": "special",
+            "match": "(\\n|,|:)|\\s"
+        },
+        {
+            "name": "operator",
+            "keywords": [
+                "snd",
+                "add",
+                "mul",
+                "div",
+                "or",
+                "and",
+                "xor",
+                "not",
+                "inc",
+                "dec",
+                "push",
+                "pop",
+                "go"
+            ]
+        },
+        {
+            "name": "size_modifer",
+            "keywords":[
+                "data8",
+                "data16",
+                "data32",
+                "data64",
+                "data128"
+            ]
+        },
+        {
+            "name": "integer",
+            "match": "^[\\-]*[0-9]+$"
+        },
+        {
+            "name": "hex",
+            "match": "^0x[A-F0-9]+$"
+        },
+        {
+            "name": "exponent",
+            "match": "^([\\-]*[0-9]+\\.)*[0-9]+e[\\+\\-][0-9]+$"
+        },
+        {
+            "name": "float",
+            "match": "^[\\-]*[0-9]+\\.[0-9]+$"
+        },
+        {
+            "name": "register",
+            "match": "^r[0-7]$"
+        },
+        {
+            "name": "string",
+            "match": "^'[^']+'$"
+        },
+        {
+            "name": "name",
+            "match": "^[a-zA-Z0-9]+$"
+        }
+    ],
+
+    "grammar":
+    {
+        "numeric":{
+            "commentary": "$lexem.number",
+            "rule":{
+                "switch":[
+                    {
+                        "lexem": "integer",
+                        "value": true
+                    },
+                    {
+                        "lexem": "hex",
+                        "value": true
+                    },
+                    {
+                        "lexem": "exponent",
+                        "value": true
+                    },
+                    {
+                        "lexem": "float",
+                        "value": true
+                    }
+                ]
+            }
+        },
+        "string":{
+            "commentary": "",
+            "rule":{
+                "lexem": "string",
+                "value": true
+            }
+        },
+        "simple":{
+            "commentary": "$lexem.name | $lexem.register | rule.numeric",
+            "rule":{
+                "switch":[
+                    {
+                        "lexem": "name",
+                        "value": true
+                    },
+                    {
+                        "lexem": "register",
+                        "value": true
+                    },
+                    {
+                        "rule": "numeric"
+                    },
+                    {
+                        "rule": "string"
+                    }
+                ]
+            }
+        },
+        "single_operand_instruction":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                      "switch": [
+                          {
+                              "keyword": "go",
+                              "value": true
+                          },
+                          {
+                              "keyword": "push",
+                              "value": true
+                          },
+                          {
+                              "keyword": "pop",
+                              "value": true
+                          }
+                      ],
+                      "value": true,
+                      "fault": false,
+                      "elect": false,
+                      "crit": "single operand instruction missing operator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "single operand instruction missing operand"
+                    }
+                ]
+            }
+        },
+        "double_operand_instruction":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                        "switch": [
+                            {
+                                "keyword": "snd",
+                                "value": true
+                            },
+                            {
+                                "keyword": "not",
+                                "value": true
+                            },
+                            {
+                                "keyword": "inc",
+                                "value": true
+                            },
+                            {
+                                "keyword": "dec",
+                                "value": true
+                            }
+                        ],
+                        "value": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "double operand instruction missing operator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "double operand instruction missing first operand"
+                    },
+                    {
+                        "keyword": ",",
+                        "value": false,
+                        "elect": false,
+                        "crit": "double operand instruction missing separator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "double operand instruction missing second operand"
+                    }
+                ]
+            }
+        },
+        "triple_operand_instruction":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                        "switch": [
+                            {
+                                "keyword": "add",
+                                "value": true
+                            },
+                            {
+                                "keyword": "mul",
+                                "value": true
+                            },
+                            {
+                                "keyword": "div",
+                                "value": true
+                            },
+                            {
+                                "keyword": "or",
+                                "value": true
+                            },
+                            {
+                                "keyword": "and",
+                                "value": true
+                            },
+                            {
+                                "keyword": "xor",
+                                "value": true
+                            }
+                        ],
+                        "value": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing operator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing first operand"
+                    },
+                    {
+                        "keyword": ",",
+                        "value": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing first separator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing second operand"
+                    },
+                    {
+                        "keyword": ",",
+                        "value": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing second separator"
+                    },
+                    {
+                        "rule": "simple",
+                        "child": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "triple operand instruction missing third operand"
+                    }
+                ]
+            }
+        },
+        "instruction":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                      "switch":[
+                          {
+                              "rule": "single_operand_instruction"
+                          },
+                          {
+                              "rule": "double_operand_instruction"
+                          },
+                          {
+                              "rule": "triple_operand_instruction"
+                          }
+                      ],
+                      "child": true,
+                      "fault": false,
+                      "elect": false
+                    }
+                ]
+            }
+        },
+        "list":{
+            "commentary": "",
+            "rule":{
+                "split":{
+                    "term": {
+                        "rule": "simple"
+                    },
+                    "separator": {
+                        "keyword": ",",
+                        "value": true
+                    },
+                    "crit_left": "list missing first element",
+                    "crit_right": "list missing second element"
+                }
+            }
+        },
+        "data":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                        "lexem": "size_modifer",
+                        "value": true,
+                        "elect": false,
+                        "crit": "data missing size modifer"
+                    },
+                    {
+                      "rule": "list",
+                      "child": true,
+                      "fault": false,
+                      "elect": false
+                    }
+                ]
+            }
+        },
+        "label":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                    {
+                        "rule": "simple",
+                        "child": false,
+                        "value": true,
+                        "fault": false,
+                        "elect": false,
+                        "crit": "label missing name"
+                    },
+                    {
+                        "keyword": ":",
+                        "value": false,
+                        "elect": false,
+                        "crit": "label missing ':' sign"
+                    },
+                    {
+                        "rule": "data",
+                        "child": true,
+                        "fault": false,
+                        "elect": true
+                    }
+                ]
+            }
+        },
+        "statement":{
+            "commentary": "",
+            "rule":{
+                "sequence":[
+                  {
+                    "switch":[
+                        {
+                            "rule": "label"
+                        },
+                        {
+                            "rule": "instruction"
+                        }
+                    ],
+                    "child": true,
+                    "fault": false,
+                    "elect": false
+                  },
+                  {
+                      "switch":[
+                          {
+                              "keyword": "\n",
+                              "value": false
+                          },
+                          {
+                              "lexem": "eof",
+                              "value": false
+                          }
+                      ],
+                      "child": false,
+                      "fault": false,
+                      "elect": false,
+                      "crit": "wrong instruction"
+                  }
+                ]
+            }
+        },
+        "program":{
+            "commentary": "",
+            "rule":{
+                "list":{
+                    "term":{
+                        "rule": "statement"
+                    }
+                }
+            }
+        }
+    },
+    "main_rule": "program"
+}
