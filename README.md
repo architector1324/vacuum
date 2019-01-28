@@ -1,5 +1,3 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/architector1324/vacuum/badge)](https://www.codefactor.io/repository/github/architector1324/vacuum)
-
 ![](docs/logo.svg)
 
 **Vacuum** is a programming language that is an multilevel ***assembler*** that using object-oriented, functional, procedural and low-level paradigms together. This language was created to use the convenient development of **highly optimized programs** for ***cross-platform***, ***embedded systems*** and ***IOT***.
