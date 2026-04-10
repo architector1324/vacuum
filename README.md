@@ -4,6 +4,10 @@
 
 **Vacuum** is a programming language that is an multilevel **portable assembly** for the 21st century. It use object-oriented, functional, procedural and low-level paradigms together. This language was created to use the convenient development of **highly optimized programs** for **cross-platform**, **embedded systems** or everything you want.
 
+C is often called a "portable assembler" - but it still hides how your data is stored, how registers are allocated, and how functions are called. Real assembler gives you that control, but ties you to a single architecture. Vacuum is the middle ground: assembly-level transparency that compiles anywhere.
+
+**Key features**:
+
 - **Lower** than **C** - you control registers, stack and memory placement directly.
 - **Powerfull** as **C++ or Rust**.
 - **Object-oriented** programming like in **Rust or Go**.
@@ -120,7 +124,7 @@ Congratulations!
   ; same
 ```
 
-- Goto. (Is it okay? May be deprecated)
+- Goto.
 
 ```
   ; go [address]
@@ -632,13 +636,18 @@ This documentation using the **x86_64** platform as example. For other platforms
   call foo()           ; call foo
 ```
 
-- In the **vac** language, despite the nature of the assembler, it is impossible to execute the **jmp** instruction, since it's not safe. Instead, so-called **direct-calls** of methods were introduced. It is **not recommended** to use such calls in different parts of the program, as this leads to duplication of code.
+- In the **vac** language, despite the nature of the assembler, it is impossible to execute the **go** instruction outside of the current scope, since it's not safe. Instead, so-called **direct-calls** of methods were introduced. It is **not recommended** to use such calls in different parts of the program, as this leads to duplication of code.
 
 ```
-  vac foo() {}   ; foo: jmp foo_ret
+  vac foo()        ; foo:
+  {
+      trap:
+      go end       ; jmp foo_end (ok, same scope)
+      snd 5, r0    ; mov rax, 5
+      end:
+  }                ; foo_end: ret
 
-  call(m) foo()     ; jmp foo
-  ;some code        ; foo_ret:
+  go trap          ; error, label is in foo's scope
 ```
 
 - Encapsulation of methods. You can declare methods inside methods.
