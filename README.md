@@ -2,15 +2,16 @@
 
 ![](docs/logo.svg)
 
-**Vacuum** is a programming language that is an multilevel **_assembler_** that using object-oriented, functional, procedural and low-level paradigms together. This language was created to use the convenient development of **highly optimized programs** for **_cross-platform_**, **_embedded systems_** and **_IOT_**.
+**Vacuum** is a programming language that is an multilevel **portable assembly** for the 21st century. It use object-oriented, functional, procedural and low-level paradigms together. This language was created to use the convenient development of **highly optimized programs** for **cross-platform**, **embedded systems** or everything you want.
 
-- **Lower** than **_C_**
-- **Powerfull** as **_C++_**
-- (May be deprecated) **Object-oriented** programming like in **_Rust or Go_**
-- **Package system** like in **_Python_**
-- Own **virtual machine** witch assembler is like in **_ARM_** platform
-- **FSM** using instead **_conditionals_**
-- **Multithreading** implements as **_NFA_**
+- **Lower** than **C** - you control registers, stack and memory placement directly.
+- **Powerfull** as **C++ or Rust**.
+- **Object-oriented** programming like in **Rust or Go**.
+- **Package system** like in **Python or Go**.
+- Own **virtual machine** with an **ARM-like** instruction set - interpret, compile to bytecode, or go native.
+- **FSM** using instead **conditionals**.
+- ?**Multithreading** implements as **NFA**.
+- **Every construct has a known cost** - each example in this spec shows the exact instructions it compiles to.
 
 ## Compilation stages
 
@@ -23,12 +24,12 @@
 Open up any editor you want and create a new file `main.vac`.
 
 ```
-  import std.io
+import std.io
 
-  var64 main() {
-      call writeln('Hello, World!', 13)
-      ret 0
-  }
+var64 main() {
+    call writeln('Hello, World!', 13)
+    ret 0
+}
 ```
 
 Go on to terminal and type.
@@ -202,7 +203,7 @@ This documentation using the **x86_64** platform as example. For other platforms
   var8 b(7)         ; b db 7
   var64 c(8)        ; c dq 8
 
-  vacuum ptr p(a)   ; p dq a
+  vac ptr p(a)   ; p dq a
   snd b, p          ; ok
   snd c, p          ; ok
 ```
@@ -361,13 +362,13 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Declaring a simple method with no return value.
 
 ```
-  vacuum foo() {}   ; foo: ret
+  vac foo() {}   ; foo: ret
 ```
 
 - Every program **should have method** _main()_, else code will be executed from **first instruction**.
 
 ```
-  vacuum main() {}   ; main: ret
+  vac main() {}   ; main: ret
   snd 7, r0          ; code started here else
 ```
 
@@ -386,7 +387,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Declaring the function with single instruction.
 
 ```
-  vacuum foo() snd 5, r0   ; foo:
+  vac foo() snd 5, r0   ; foo:
                            ; mov rax, 5
                            ; ret
   call foo()               ; call foo
@@ -432,11 +433,11 @@ This documentation using the **x86_64** platform as example. For other platforms
   call foo()                  ; call foo
 ```
 
-- The **vacuum** language also allows for flexibility in function calls. You can use the standard method of calling a function with saving the address of the subsequent instruction **to the stack**, or another way with saving this address **into the register**. This is called a **_register-call function_**.
+- The **vac** language also allows for flexibility in function calls. You can use the standard method of calling a function with saving the address of the subsequent instruction **to the stack**, or another way with saving this address **into the register**. This is called a **register-call function**.
   Strongly **not recommended** to use call and register-call at the same function in program, because of double code.
 
 ```
-  vacuum foo() {}   ; foo: ret
+  vac foo() {}   ; foo: ret
                     ; foo_rcall: jmp rax
 
   call foo()        ; call foo
@@ -447,7 +448,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 - The function declaration with the transfer of parameters through the stack.
 
 ```
-  vacuum foo(var64 a) {}   ; foo: ret
+  vac foo(var64 a) {}   ; foo: ret
   call foo(7)              ; push 7
                            ; call foo
 ```
@@ -455,7 +456,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Passing parameters to a function can also occur through registers. After calling the function, the registers are unbind.
 
 ```
-  vacuum foo((r)var64 a) {}   ; foo: ret
+  vac foo((r)var64 a) {}   ; foo: ret
   call foo(7)                 ; mov rax, 7
                               ; call foo
 ```
@@ -464,7 +465,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 
 ```
                       ; c dq 5
-  vacuum foo()        ; foo:
+  vac foo()        ; foo:
   {
       var64 a(5)      ; push 5
       (s)var64 b(5)   ; push 5
@@ -478,8 +479,8 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Polymorphism of functions.
 
 ```
-  vacuum foo() {}       ; foo_0 : ret
-  vacuum foo(var64 a)   ; foo_1: ret
+  vac foo() {}       ; foo_0 : ret
+  vac foo(var64 a)   ; foo_1: ret
 
   call foo()            ; call foo_0
   call foo(5)           ; push 5
@@ -526,7 +527,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 ```
   (a)var64 a(5)                     ; a dq 5
 
-  vacuum foo()
+  vac foo()
   {
       (a)var64 b(7)                 ; mov rax, 7
       (a)var8[8] str('qwerty12')    ; mov rbx, 'qwerty12'
@@ -580,9 +581,9 @@ This documentation using the **x86_64** platform as example. For other platforms
 
 ```
   var64 foo(var64 x, var8 y) ret 5
-  vacuum foo2(var8 x) {}
+  vac foo2(var8 x) {}
 
-  vacuum dgt my_delegate(foo)
+  vac dgt my_delegate(foo)
   call my_delegate(5, 7)
 
   snd  foo2, my_delegate
@@ -590,7 +591,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 
   ; IMPLEMENTS AS
 
-  (var64 ptr(var64, var8), vacuum ptr(var8)) pac dgt_my_delegate(foo)
+  (var64 ptr(var64, var8), vac ptr(var8)) pac dgt_my_delegate(foo)
   call dgt_my_delegate[0](5, 7)
 
   snd foo2, dgt_my_delegate[1]
@@ -601,9 +602,9 @@ This documentation using the **x86_64** platform as example. For other platforms
 
 ```
   var64 foo(var64 x, var8 y) ret 5
-  vacuum foo(var8 x) {}
+  vac foo(var8 x) {}
 
-  vacuum dgt my_delegate(foo)
+  vac dgt my_delegate(foo)
   call my_delegate(5, 7)
   call my_delegate(9)
 ```
@@ -613,9 +614,9 @@ This documentation using the **x86_64** platform as example. For other platforms
 ```
   var64 a(5)           ; a dq 5
 
-  vacuum prefoo() {}   ; prefoo: ret
+  vac prefoo() {}   ; prefoo: ret
 
-  vacuum foo() safe    ; foo:
+  vac foo() safe    ; foo:
   {                    ; push rax
       var64 b(5)       ; push 5
       (r)var64 c(6)    ; mov rax, c
@@ -631,10 +632,10 @@ This documentation using the **x86_64** platform as example. For other platforms
   call foo()           ; call foo
 ```
 
-- In the **vacuum** language, despite the nature of the assembler, it is impossible to execute the **_jmp_** instruction, since it's not safe. Instead, so-called **_direct-calls_** of methods were introduced. It is **not recommended** to use such calls in different parts of the program, as this leads to duplication of code.
+- In the **vac** language, despite the nature of the assembler, it is impossible to execute the **jmp** instruction, since it's not safe. Instead, so-called **direct-calls** of methods were introduced. It is **not recommended** to use such calls in different parts of the program, as this leads to duplication of code.
 
 ```
-  vacuum foo() {}   ; foo: jmp foo_ret
+  vac foo() {}   ; foo: jmp foo_ret
 
   call(m) foo()     ; jmp foo
   ;some code        ; foo_ret:
@@ -643,9 +644,9 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Encapsulation of methods. You can declare methods inside methods.
 
 ```
-  vacuum foo()         ; foo:
+  vac foo()         ; foo:
   {                    ; mov rax, 5
-      vacuum same()    ; foo_same:
+      vac same()    ; foo_same:
       {
           snd 7, r0    ; mov rax, 7
       }                ; ret
@@ -660,7 +661,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Conditional-calls (only for direct and register calls). By default, conditional-call is a direct-call.
 
 ```
-  vacuum foo() {}         ; foo: jmp foo_ret
+  vac foo() {}         ; foo: jmp foo_ret
 
   (5 = 5)call(m) foo()    ; cmp 5, 5
                           ; je foo
@@ -668,7 +669,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 ```
 
 ```
-  vacuum foo() {}         ; foo: jmp rax
+  vac foo() {}         ; foo: jmp rax
 
   (5 = 5)call(r) foo()    ; cmp 5, 5
                           ; lea rax, [$ + 8 + 2]
@@ -693,15 +694,15 @@ This documentation using the **x86_64** platform as example. For other platforms
                      ; next:
 ```
 
-- In the **vacuum** language there are **_no cycles_**, recursions are used instead.
+- In the **vac** language there are **no cycles**, recursions are used instead.
 
 ```
-  vacuum while_true()             ; while_true:
+  vac while_true()             ; while_true:
   {
       call(m) while_true()        ; jmp while_true
   }                               ; ret
 
-  vacuum for((r)var64 i)          ; for:
+  vac for((r)var64 i)          ; for:
   {                               ; cmp rax, 100
       (i < 100)call(m) for(i++)   ; inc rax
                                   ; jl for
@@ -715,14 +716,14 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Declaring an anonymous function.
 
 ```
-  vacuum ()       ; anon:
+  vac ()       ; anon:
   {
       snd 4, r0   ; mov rax, 4
   }               ; ret
 ```
 
 ```
-  vacuum foo(var64(r0) a, (r1)((r2)var64) ptr callback())   ; foo:
+  vac foo(var64(r0) a, (r1)((r2)var64) ptr callback())   ; foo:
   {                                                         ; call rbx
       snd a + callback(), r0                                ; add rax, rcx
   }                                                         ; ret
@@ -736,10 +737,10 @@ This documentation using the **x86_64** platform as example. For other platforms
                                                             ; call foo
 ```
 
-- Encapsulated methods with a **public** access modifier can be called from outside. It is a **_deep-call_**.
+- Encapsulated methods with a **public** access modifier can be called from outside. It is a **deep-call**.
 
 ```
-  vacuum foo((r)var64 a)                 ; foo: ret
+  vac foo((r)var64 a)                 ; foo: ret
   {
       public (r)var64 some((r)var64 b)   ; foo_some:
       {                                  ; mov rcx, rax
@@ -755,7 +756,7 @@ This documentation using the **x86_64** platform as example. For other platforms
 - Inheritance of methods.
 
 ```
-  vacuum foo((r)var64 a)                         ; foo: ret
+  vac foo((r)var64 a)                         ; foo: ret
   {
       protected (r)var64 some((r)var64 b)        ; foo_some:
       {                                          ; mov rcx, rax
@@ -777,4 +778,4 @@ This documentation using the **x86_64** platform as example. For other platforms
 
 #### OOP
 
-Deprecated.
+TBD ...
